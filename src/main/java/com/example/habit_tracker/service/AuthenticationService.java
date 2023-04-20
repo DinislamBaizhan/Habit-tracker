@@ -5,12 +5,18 @@ import com.example.habit_tracker.data.enums.TokenType;
 import com.example.habit_tracker.data.request.AuthenticationRequest;
 import com.example.habit_tracker.data.response.AuthenticationResponse;
 import com.example.habit_tracker.repository.TokenRepository;
+import jakarta.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationService {
+
+    Logger logger = LogManager.getLogger();
     private final ProfileService profileService;
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
@@ -25,7 +31,7 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse register(RegisterDTO request) {
+    public AuthenticationResponse register(@Valid RegisterDTO request) {
 
         Profile profile = profileService.createUser(request);
         String jwtToken = jwtService.generateToken(profile);
@@ -43,11 +49,11 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        var profile = profileService.findByEmail(request.getEmail())
-                .orElseThrow();
+        var profile = profileService.findByEmail(request.getEmail());
         var jwtToken = jwtService.generateToken(profile);
         revokeAllUserTokens(profile);
         saveUserToken(profile, jwtToken);
+        logger.info("Authentication");
         return new AuthenticationResponse(
                 jwtToken
         );
@@ -60,7 +66,13 @@ public class AuthenticationService {
                 false,
                 false, profile
         );
-        tokenRepository.save(token);
+        logger.info("save token");
+       try {
+           tokenRepository.save(token);
+       }catch (Exception e) {
+           logger.error("Failed to save new token", e.getCause());
+           throw new RuntimeException("Failed to save new token", e.getCause());
+       }
     }
 
     public void revokeAllUserTokens(Profile profile) {
@@ -71,7 +83,12 @@ public class AuthenticationService {
             token.setExpired(true);
             token.setRevoked(true);
         });
-        tokenRepository.saveAll(validUserTokens);
+        try {
+            tokenRepository.saveAll(validUserTokens);
+        } catch (Exception e) {
+            logger.error("Failed to save all tokens\", e.getCause()");
+            throw new RuntimeException("Failed to save all tokens", e.getCause());
+        }
     }
 }
 

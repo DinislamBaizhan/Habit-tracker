@@ -1,28 +1,28 @@
 package com.example.habit_tracker.service;
 
+import com.example.habit_tracker.data.ProfileDTO;
 import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.entity.RegisterDTO;
 import com.example.habit_tracker.data.enums.Role;
 import com.example.habit_tracker.exception.DataNotFound;
-import com.example.habit_tracker.exception.UnauthorizedException;
+import com.example.habit_tracker.exception.DuplicateKey;
 import com.example.habit_tracker.repository.ProfileRepository;
-import org.jboss.logging.Log4j2LoggerProvider;
+import jakarta.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.example.habit_tracker.exception.*;
 
 import java.util.Optional;
 
 @Service
 public class ProfileService {
-//    private static Log4j2LoggerProvider;
     private final ProfileRepository repository;
     private final PasswordEncoder passwordEncoder;
+    Logger logger = LogManager.getLogger();
 
     public ProfileService(ProfileRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
@@ -30,22 +30,23 @@ public class ProfileService {
     }
 
 
-    private Profile getAuthenticatedProfile() {
+    public Profile getAuthenticatedProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String login = authentication.getName();
-        return repository.findByEmail(login).orElseThrow(
+        String email = authentication.getName();
+        return repository.findByEmail(email).orElseThrow(
                 () -> {
-//                    log.error("user not found");
-                    throw new DataNotFound("profile not found");
+                    logger.error("profile not found", email);
+                    return new DataNotFound("profile not found");
                 }
         );
     }
 
 
-    public Profile createUser(RegisterDTO request) {
+    public Profile createUser(@Valid RegisterDTO request) {
 
         Optional<Profile> profile = repository.findByEmail(request.getEmail());
         if (profile.isPresent()) {
+            logger.error("Profile already registered", request.getEmail());
             throw new DuplicateKey("Profile already registered");
         }
 
@@ -59,27 +60,22 @@ public class ProfileService {
 
             return repository.save(newProfile);
         } catch (DataAccessException e) {
+            logger.error("Failed to create new profile", e.getCause());
             throw new RuntimeException("Failed to create new profile", e.getCause());
         }
 
     }
 
-    public Profile get() {
-        return getAuthenticatedProfile();
+    public ProfileDTO getDTO() {
+        return new ProfileDTO(getAuthenticatedProfile());
     }
 
-    public Optional<Profile> findByEmail(String email) {
-        return repository.findByEmail(email);
+    public Profile findByEmail(String email) {
+        return repository.findByEmail(email).orElseThrow(
+                () -> {
+                    logger.error("user not found", email);
+                    return new DataNotFound("profile not found");
+                }
+        );
     }
-
-//    public User edit(Long id, User user) {
-//        Optional<User> optionalUser = repository.findById(id);
-//        if (optionalUser.isPresent()) {
-//            optionalUser.get().setFirstname(user.getFirstname());
-//            optionalUser.get().setLastname(user.getLastname());
-//
-//            return repository.save(optionalUser.get());
-//        }
-//        return null;
-//    }
 }

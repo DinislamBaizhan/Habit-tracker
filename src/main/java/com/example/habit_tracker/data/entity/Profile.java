@@ -3,9 +3,7 @@ import com.example.habit_tracker.data.Password;
 import com.example.habit_tracker.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.lang.NonNull;
@@ -113,7 +111,7 @@ public class Profile extends BaseEntity implements UserDetails {
         this.email = email;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(@NonNull String password) {
         this.password = password;
     }
 
