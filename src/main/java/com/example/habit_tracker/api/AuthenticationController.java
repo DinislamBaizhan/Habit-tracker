@@ -43,10 +43,28 @@ public class AuthenticationController {
         DecodedToken decodedToken = DecodedToken.getDecoded(token);
 
         String email = decodedToken.sub;
+        String exp = decodedToken.exp;
 
         Profile profile = profileService.findByEmail(email);
         profileService.updateVerify(profile);
         return ResponseEntity.ok("your profile has been successfully activated");
+    }
+
+    @PostMapping("/again")
+    public ResponseEntity<String> sendAgain(@RequestBody RegisterDTO registerDTO) {
+
+
+        Profile profile = profileService.findByEmail(registerDTO.getEmail());
+
+        RegisterDTO register = new RegisterDTO(
+                profile.getFirstname(),
+                profile.getLastname(),
+                profile.getEmail(),
+                profile.getPassword()
+        );
+
+        service.register(register);
+        return ResponseEntity.ok("Email sent to confirm profile again");
     }
 
 }

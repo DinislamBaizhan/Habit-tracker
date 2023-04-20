@@ -1,5 +1,8 @@
 package com.example.habit_tracker.service;
 
+import com.example.habit_tracker.data.entity.Profile;
+import com.example.habit_tracker.data.entity.Token;
+import com.example.habit_tracker.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,6 +21,11 @@ import java.util.function.Function;
 public class JwtService {
 
     private static final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    private final TokenRepository repository;
+
+    public JwtService(TokenRepository repository) {
+        this.repository = repository;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -29,22 +37,30 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        int date = 1000 * 60 * 60;
+        if (userDetails.isEnabled()) {
+            date = 1000 * 60 * 60 * 24;
+            return generateToken(new HashMap<>(), userDetails, date);
+        }
+        return generateToken(new HashMap<>(), userDetails, date);
     }
+
 
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
+            UserDetails userDetails,
+            int date
     ) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + date))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
@@ -71,5 +87,9 @@ public class JwtService {
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public Token get(Profile profile) {
+        return repository.findTokenByProfile(profile);
     }
 }

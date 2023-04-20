@@ -42,17 +42,21 @@ public class Profile extends BaseEntity implements UserDetails {
     private List<Token> tokens = new ArrayList<>();
     @Column(name = "is_enabled")
     private Boolean isenabled;
+    @Column(name = "waiting_for_verification")
+    private Boolean waitingForVerification = true;
 
     public Profile(String firstname,
                    String lastname,
                    String email, @NonNull
                    String password,
-                   Role role) {
+                   Role role,
+                   Boolean waitingForVerification) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.waitingForVerification = waitingForVerification;
         isenabled = false;
     }
 
@@ -142,5 +146,13 @@ public class Profile extends BaseEntity implements UserDetails {
 
     public void setTokens(List<Token> tokens) {
         this.tokens = tokens;
+    }
+
+    public Boolean getWaitingForVerification() {
+        return waitingForVerification;
+    }
+
+    public void setWaitingForVerification(Boolean waitingForVerification) {
+        this.waitingForVerification = waitingForVerification;
     }
 }

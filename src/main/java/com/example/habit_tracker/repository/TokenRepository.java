@@ -1,5 +1,6 @@
 package com.example.habit_tracker.repository;
 
+import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.entity.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,4 +20,6 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     List<Token> findAllValidTokenByUser(Long id);
 
     Optional<Token> findByToken(String token);
+
+    Token findTokenByProfile(Profile profile);
 }

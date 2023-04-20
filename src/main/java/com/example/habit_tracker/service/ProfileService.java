@@ -42,34 +42,37 @@ public class ProfileService {
     }
 
 
-    public Profile createUser(@Valid RegisterDTO request) throws Exception {
+    public Profile createUser(@Valid RegisterDTO request) {
 
         Optional<Profile> profile = repository.findByEmail(request.getEmail());
 
-        if (profile.isPresent()) {
+        if (profile.isPresent() && profile.get().getWaitingForVerification()) {
+            return profile.get();
+        } else if (profile.isPresent() && !profile.get().getWaitingForVerification()) {
             logger.error("Profile already registered", request.getEmail());
             throw new DuplicateKey("Profile already registered");
         }
-
         try {
-            var newProfile = new Profile(
+            Profile newProfile = new Profile(
                     request.getFirstname(),
                     request.getLastname(),
                     request.getEmail(),
                     passwordEncoder.encode(request.getPassword()),
-                    Role.USER);
+                    Role.USER,
+                    true
+            );
 
             return repository.save(newProfile);
         } catch (DataAccessException e) {
             logger.error("Failed to create new profile", e.getCause());
             throw new RuntimeException("Failed to create new profile", e.getCause());
         }
-
     }
 
     public void updateVerify(Profile profile) throws Exception {
         try {
             profile.setEnabled(true);
+            profile.setWaitingForVerification(false);
             repository.save(profile);
         } catch (Exception e) {
             logger.error("error verify profile" + e.getMessage(), e.getCause());

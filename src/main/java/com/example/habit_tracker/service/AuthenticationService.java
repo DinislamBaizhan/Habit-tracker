@@ -34,10 +34,12 @@ public class AuthenticationService {
         this.emailService = emailService;
     }
 
-    public void register(@Valid RegisterDTO registerDTO) throws Exception {
+    public void register(@Valid RegisterDTO registerDTO) {
 
         logger.info("register profile" + registerDTO.getEmail());
+
         Profile profile = profileService.createUser(registerDTO);
+
         String jwtToken = jwtService.generateToken(profile);
 
         String link = "http://localhost:8080/api/v1/auth/verify-email?token=" + jwtToken;
