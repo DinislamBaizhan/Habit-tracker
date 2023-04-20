@@ -1,4 +1,5 @@
 package com.example.habit_tracker.data.entity;
+
 import com.example.habit_tracker.data.Password;
 import com.example.habit_tracker.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,23 +40,39 @@ public class Profile extends BaseEntity implements UserDetails {
     @JsonIgnore
     @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER)
     private List<Token> tokens = new ArrayList<>();
+    @Column(name = "is_enabled")
+    private Boolean isenabled;
 
-    public Profile(String firstname, String lastname, String email, @NonNull String password, Role role) {
+    public Profile(String firstname,
+                   String lastname,
+                   String email, @NonNull
+                   String password,
+                   Role role) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
         this.role = role;
+        isenabled = false;
+    }
+
+    public Profile() {
+
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
+
     @NonNull
     @Override
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(@NonNull String password) {
+        this.password = password;
     }
 
     @Override
@@ -80,11 +97,11 @@ public class Profile extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isenabled;
     }
 
-    public Profile() {
-
+    public void setEnabled(Boolean enabled) {
+        this.isenabled = enabled;
     }
 
     public String getFirstname() {
@@ -109,10 +126,6 @@ public class Profile extends BaseEntity implements UserDetails {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public void setPassword(@NonNull String password) {
-        this.password = password;
     }
 
     public Role getRole() {

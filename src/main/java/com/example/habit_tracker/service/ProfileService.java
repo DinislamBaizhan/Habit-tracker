@@ -1,6 +1,6 @@
 package com.example.habit_tracker.service;
 
-import com.example.habit_tracker.data.ProfileDTO;
+import com.example.habit_tracker.data.dto.ProfileDTO;
 import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.entity.RegisterDTO;
 import com.example.habit_tracker.data.enums.Role;
@@ -42,9 +42,10 @@ public class ProfileService {
     }
 
 
-    public Profile createUser(@Valid RegisterDTO request) {
+    public Profile createUser(@Valid RegisterDTO request) throws Exception {
 
         Optional<Profile> profile = repository.findByEmail(request.getEmail());
+
         if (profile.isPresent()) {
             logger.error("Profile already registered", request.getEmail());
             throw new DuplicateKey("Profile already registered");
@@ -64,6 +65,16 @@ public class ProfileService {
             throw new RuntimeException("Failed to create new profile", e.getCause());
         }
 
+    }
+
+    public void updateVerify(Profile profile) throws Exception {
+        try {
+            profile.setEnabled(true);
+            repository.save(profile);
+        } catch (Exception e) {
+            logger.error("error verify profile" + e.getMessage(), e.getCause());
+            throw new Exception(e.getMessage(), e.getCause());
+        }
     }
 
     public ProfileDTO getDTO() {

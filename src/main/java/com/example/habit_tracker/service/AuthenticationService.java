@@ -1,6 +1,8 @@
 package com.example.habit_tracker.service;
 
-import com.example.habit_tracker.data.entity.*;
+import com.example.habit_tracker.data.entity.Profile;
+import com.example.habit_tracker.data.entity.RegisterDTO;
+import com.example.habit_tracker.data.entity.Token;
 import com.example.habit_tracker.data.enums.TokenType;
 import com.example.habit_tracker.data.request.AuthenticationRequest;
 import com.example.habit_tracker.data.response.AuthenticationResponse;
@@ -10,53 +12,60 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationService {
 
-    Logger logger = LogManager.getLogger();
     private final ProfileService profileService;
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
+    Logger logger = LogManager.getLogger();
 
     public AuthenticationService(ProfileService profileService, TokenRepository tokenRepository,
                                  JwtService jwtService,
-                                 AuthenticationManager authenticationManager) {
+                                 AuthenticationManager authenticationManager, EmailService emailService) {
         this.profileService = profileService;
         this.tokenRepository = tokenRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.emailService = emailService;
     }
 
-    public AuthenticationResponse register(@Valid RegisterDTO request) {
+    public void register(@Valid RegisterDTO registerDTO) throws Exception {
 
-        Profile profile = profileService.createUser(request);
+        logger.info("register profile" + registerDTO.getEmail());
+        Profile profile = profileService.createUser(registerDTO);
         String jwtToken = jwtService.generateToken(profile);
+
+        String link = "http://localhost:8080/api/v1/auth/verify-email?token=" + jwtToken;
+        emailService.sendEmail(profile.getEmail(), "Email Verification", "Click on this link to verify your email: " + link);
+
         saveUserToken(profile, jwtToken);
-        return new AuthenticationResponse(
-                jwtToken
-        );
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception {
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
-        var profile = profileService.findByEmail(request.getEmail());
-        var jwtToken = jwtService.generateToken(profile);
-        revokeAllUserTokens(profile);
-        saveUserToken(profile, jwtToken);
-        logger.info("Authentication");
-        return new AuthenticationResponse(
-                jwtToken
-        );
+        Profile profile = profileService.findByEmail(request.getEmail());
+        if (profile.isEnabled()) {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+            var jwtToken = jwtService.generateToken(profile);
+            revokeAllUserTokens(profile);
+            saveUserToken(profile, jwtToken);
+            logger.info("Authentication");
+            return new AuthenticationResponse(
+                    jwtToken
+            );
+        } else {
+            throw new Exception("Verify email");
+        }
     }
 
     public void saveUserToken(Profile profile, String jwtToken) {
@@ -67,12 +76,12 @@ public class AuthenticationService {
                 false, profile
         );
         logger.info("save token");
-       try {
-           tokenRepository.save(token);
-       }catch (Exception e) {
-           logger.error("Failed to save new token", e.getCause());
-           throw new RuntimeException("Failed to save new token", e.getCause());
-       }
+        try {
+            tokenRepository.save(token);
+        } catch (Exception e) {
+            logger.error("Failed to save new token", e.getCause());
+            throw new RuntimeException("Failed to save new token", e.getCause());
+        }
     }
 
     public void revokeAllUserTokens(Profile profile) {

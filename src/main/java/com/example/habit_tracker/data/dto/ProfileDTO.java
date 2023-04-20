@@ -1,4 +1,4 @@
-package com.example.habit_tracker.data;
+package com.example.habit_tracker.data.dto;
 
 import com.example.habit_tracker.data.entity.Profile;
 

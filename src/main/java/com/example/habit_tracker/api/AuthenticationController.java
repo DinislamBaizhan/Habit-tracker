@@ -1,42 +1,52 @@
 package com.example.habit_tracker.api;
 
+import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.entity.RegisterDTO;
 import com.example.habit_tracker.data.request.AuthenticationRequest;
 import com.example.habit_tracker.data.response.AuthenticationResponse;
-import com.example.habit_tracker.repository.ProfileRepository;
 import com.example.habit_tracker.service.AuthenticationService;
+import com.example.habit_tracker.service.DecodedToken;
+import com.example.habit_tracker.service.ProfileService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthenticationController {
     private final AuthenticationService service;
-    private final ProfileRepository profileRepository;
+    private final ProfileService profileService;
 
-    public AuthenticationController(
-            AuthenticationService service,
-            ProfileRepository profileRepository) {
+    public AuthenticationController(AuthenticationService service,
+                                    ProfileService profileService) {
         this.service = service;
-        this.profileRepository = profileRepository;
+        this.profileService = profileService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
+    public ResponseEntity<String> register(
             @RequestBody @Valid RegisterDTO request
-    ) {
-
-        return ResponseEntity.ok(service.register(request));
+    ) throws Exception {
+        service.register(request);
+        return ResponseEntity.ok("Email sent to verify profile");
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(service.authenticate(request));
     }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) throws Exception {
+        DecodedToken decodedToken = DecodedToken.getDecoded(token);
+
+        String email = decodedToken.sub;
+
+        Profile profile = profileService.findByEmail(email);
+        profileService.updateVerify(profile);
+        return ResponseEntity.ok("your profile has been successfully activated");
+    }
+
 }
