@@ -1,6 +1,7 @@
 package com.example.habit_tracker.data.entity;
 
 import com.example.habit_tracker.data.Password;
+import com.example.habit_tracker.data.enums.Color;
 import com.example.habit_tracker.data.enums.Language;
 import com.example.habit_tracker.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,10 +23,10 @@ import java.util.List;
 @Table(name = "profiles")
 public class Profile extends BaseEntity implements UserDetails {
     @NotNull
-    @Size(min = 2, max = 20, message = "")
+    @Size(min = 2, max = 20)
     private String firstname;
     @NotNull
-    @Size(min = 2, max = 20, message = "")
+    @Size(min = 2, max = 20)
     private String lastname;
     @Email
     @NotNull
@@ -45,7 +46,6 @@ public class Profile extends BaseEntity implements UserDetails {
     private Boolean isenabled;
     @JsonIgnore
     private Boolean waitingForVerification = true;
-    @Column(name = "icon_link")
     private String iconLink;
     @Enumerated(EnumType.STRING)
     private Language language;

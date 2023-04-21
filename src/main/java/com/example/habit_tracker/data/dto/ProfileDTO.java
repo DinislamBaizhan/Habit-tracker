@@ -1,15 +1,13 @@
 package com.example.habit_tracker.data.dto;
 
-import com.example.habit_tracker.data.entity.Color;
+import com.example.habit_tracker.data.enums.Color;
 import com.example.habit_tracker.data.enums.Language;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProfileDTO {
     private String firstname;
-
     private String lastname;
-
     private String email;
     private String icon;
     private Language language;

@@ -134,6 +134,22 @@ public class ProfileService {
         return getDTO();
     }
 
+    public ProfileDTO addLanguage(String language) throws JsonProcessingException {
+        ProfileDTO profileDTO = objectMapper.readValue(language, ProfileDTO.class);
+        Profile profile = getAuthenticatedProfile();
+        profile.setLanguage(profileDTO.getLanguage());
+        save(profile);
+        return getDTO();
+    }
+
+    public ProfileDTO addColor(String color) throws JsonProcessingException {
+        ProfileDTO profileDTO = objectMapper.readValue(color, ProfileDTO.class);
+        Profile profile = getAuthenticatedProfile();
+        profile.setColor(profileDTO.getColor());
+        save(profile);
+        return getDTO();
+    }
+
     public void delete() {
         Profile profile = getAuthenticatedProfile();
         try {

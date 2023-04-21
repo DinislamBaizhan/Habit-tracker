@@ -22,14 +22,24 @@ public class ProfileController {
         return profileService.getDTO();
     }
 
-    @PatchMapping("name")
+    @PatchMapping("/name")
     public ProfileDTO rename(@RequestBody List<String> name) {
         return profileService.rename(name);
     }
 
-    @PatchMapping("icon")
+    @PatchMapping("/icon")
     public ProfileDTO addIcon(@RequestBody String link) throws JsonProcessingException {
         return profileService.addIcon(link);
+    }
+
+    @PatchMapping("/language")
+    public ProfileDTO language(@RequestBody String language) throws JsonProcessingException {
+        return profileService.addLanguage(language);
+    }
+
+    @PatchMapping("/color")
+    public ProfileDTO color(@RequestBody String color) throws JsonProcessingException {
+        return profileService.addColor(color);
     }
 
     @DeleteMapping
