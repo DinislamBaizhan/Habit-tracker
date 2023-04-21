@@ -48,7 +48,12 @@ public class AuthenticationService {
         String jwtToken = jwtService.generateToken(profile, tokenExpiredDate);
 
         String link = "http://localhost:8080/api/v1/auth/verify-email?token=" + jwtToken;
-        emailService.sendEmail(profile.getEmail(), "Email Verification", "Click on this link to verify your email: " + link);
+
+        String emailContent = "<html><body><p>Нажмите на кнопку, чтобы подтвердить свой аккаунт:</p>" +
+                "<form method='POST' action='" + link + "'><input type='submit' value='Verify Email'/>"
+                + "</form></body></html>";
+
+        emailService.sendEmail(profile.getEmail(), "Email Verification", emailContent);
 
         saveUserToken(profile, jwtToken);
     }
