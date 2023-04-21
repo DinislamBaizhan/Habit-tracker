@@ -1,6 +1,7 @@
 package com.example.habit_tracker.data.entity;
 
 import com.example.habit_tracker.data.Password;
+import com.example.habit_tracker.data.enums.Language;
 import com.example.habit_tracker.data.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -44,6 +45,12 @@ public class Profile extends BaseEntity implements UserDetails {
     private Boolean isenabled;
     @JsonIgnore
     private Boolean waitingForVerification = true;
+    @Column(name = "icon_link")
+    private String iconLink;
+    @Enumerated(EnumType.STRING)
+    private Language language;
+    @Enumerated(EnumType.STRING)
+    private Color color;
 
     public Profile(String firstname,
                    String lastname,
@@ -77,6 +84,30 @@ public class Profile extends BaseEntity implements UserDetails {
 
     public void setPassword(@NonNull String password) {
         this.password = password;
+    }
+
+    public String getIconLink() {
+        return iconLink;
+    }
+
+    public void setIconLink(String iconLink) {
+        this.iconLink = iconLink;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     @Override

@@ -1,18 +1,54 @@
 package com.example.habit_tracker.data.dto;
 
-import com.example.habit_tracker.data.entity.Profile;
+import com.example.habit_tracker.data.entity.Color;
+import com.example.habit_tracker.data.enums.Language;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProfileDTO {
     private String firstname;
 
     private String lastname;
 
     private String email;
+    private String icon;
+    private Language language;
+    private Color color;
 
-    public ProfileDTO(Profile profile) {
-        this.firstname = profile.getFirstname();
-        this.lastname = profile.getLastname();
-        this.email = profile.getEmail();
+    public ProfileDTO(String firstname, String lastname, String email, String icon, Language language, Color color) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.email = email;
+        this.icon = icon;
+        this.language = language;
+        this.color = color;
+    }
+
+    public ProfileDTO() {
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public String getFirstname() {

@@ -7,6 +7,8 @@ import com.example.habit_tracker.data.enums.Role;
 import com.example.habit_tracker.exception.DataNotFound;
 import com.example.habit_tracker.exception.DuplicateKey;
 import com.example.habit_tracker.repository.ProfileRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,17 +18,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProfileService {
     private final ProfileRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final ObjectMapper objectMapper;
     Logger logger = LogManager.getLogger();
 
-    public ProfileService(ProfileRepository repository, PasswordEncoder passwordEncoder) {
+    public ProfileService(ProfileRepository repository, PasswordEncoder passwordEncoder, ObjectMapper objectMapper) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -82,7 +87,15 @@ public class ProfileService {
     }
 
     public ProfileDTO getDTO() {
-        return new ProfileDTO(getAuthenticatedProfile());
+        Profile profile = getAuthenticatedProfile();
+        return new ProfileDTO(
+                profile.getFirstname(),
+                profile.getLastname(),
+                profile.getEmail(),
+                profile.getIconLink(),
+                profile.getLanguage(),
+                profile.getColor()
+        );
     }
 
     public Profile findByEmail(String email) {
@@ -103,6 +116,23 @@ public class ProfileService {
         }
     }
 
+    public ProfileDTO rename(List<String> name) {
+        Profile profile = getAuthenticatedProfile();
+        profile.setFirstname(name.get(0));
+        profile.setLastname(name.get(1));
+        logger.info("rename: firstname - " + name.get(0) + "lastname -" + name.get(1));
+        repository.save(profile);
+        return getDTO();
+    }
+
+    public ProfileDTO addIcon(String link) throws JsonProcessingException {
+        ProfileDTO pDTO = objectMapper.readValue(link, ProfileDTO.class);
+        Profile profile = getAuthenticatedProfile();
+        profile.setIconLink(pDTO.getIcon());
+        save(profile);
+        logger.info("add icon");
+        return getDTO();
+    }
 
     public void delete() {
         Profile profile = getAuthenticatedProfile();
@@ -112,6 +142,16 @@ public class ProfileService {
         } catch (DataAccessException e) {
             logger.trace("profile not found " + e.getMessage() + "cause" + e.getCause());
             throw new DataNotFound("profile not found " + e.getMessage());
+        }
+    }
+
+
+    public Profile save(Profile profile) {
+        try {
+            return repository.save(profile);
+        } catch (Exception e) {
+            logger.error("fail save to database " + profile);
+            throw new RuntimeException("fail save to database " + profile);
         }
     }
 }
