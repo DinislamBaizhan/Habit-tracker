@@ -1,6 +1,9 @@
 package com.example.habit_tracker.data.entity;
+
 import com.example.habit_tracker.data.enums.TokenType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Entity
 public class Token extends BaseEntity {
@@ -20,6 +23,7 @@ public class Token extends BaseEntity {
     public boolean expired;
 
     @ManyToOne
+    @Cascade(CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     public Profile profile;
 

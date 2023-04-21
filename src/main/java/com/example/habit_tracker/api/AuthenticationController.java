@@ -7,7 +7,9 @@ import com.example.habit_tracker.data.response.AuthenticationResponse;
 import com.example.habit_tracker.service.AuthenticationService;
 import com.example.habit_tracker.service.DecodedToken;
 import com.example.habit_tracker.service.ProfileService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +30,7 @@ public class AuthenticationController {
             @RequestBody @Valid RegisterDTO request
     ) throws Exception {
         service.register(request);
-        return ResponseEntity.ok("Email sent to verify profile");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Email sent to verify profile");
     }
 
     @PostMapping("/authenticate")
@@ -41,17 +43,14 @@ public class AuthenticationController {
     @PostMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) throws Exception {
         DecodedToken decodedToken = DecodedToken.getDecoded(token);
-
         String email = decodedToken.sub;
-        String exp = decodedToken.exp;
-
         Profile profile = profileService.findByEmail(email);
         profileService.updateVerify(profile);
         return ResponseEntity.ok("your profile has been successfully activated");
     }
 
     @PostMapping("/again")
-    public ResponseEntity<String> sendAgain(@RequestBody RegisterDTO registerDTO) {
+    public ResponseEntity<String> sendAgain(@RequestBody RegisterDTO registerDTO) throws Exception {
 
 
         Profile profile = profileService.findByEmail(registerDTO.getEmail());
@@ -67,4 +66,24 @@ public class AuthenticationController {
         return ResponseEntity.ok("Email sent to confirm profile again");
     }
 
+    @PostMapping("/reset_password")
+    public ResponseEntity<String> passwordReset(@RequestBody String email) throws JsonProcessingException {
+        service.resetPassword(email);
+        return ResponseEntity.ok("check your email to reset your password");
+    }
+
+    @PatchMapping("/reset-password")
+    public ResponseEntity<String> passwordReset(
+            @RequestParam("token") String token,
+            @RequestBody String password
+    ) throws Exception {
+
+        DecodedToken decodedToken = DecodedToken.getDecoded(token);
+        String email = decodedToken.sub;
+        Profile profile = profileService.findByEmail(email);
+
+        service.updatePassword(profile, password);
+
+        return ResponseEntity.ok("your password has been successfully updated");
+    }
 }

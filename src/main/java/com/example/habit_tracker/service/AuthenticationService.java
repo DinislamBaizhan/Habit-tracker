@@ -7,6 +7,8 @@ import com.example.habit_tracker.data.enums.TokenType;
 import com.example.habit_tracker.data.request.AuthenticationRequest;
 import com.example.habit_tracker.data.response.AuthenticationResponse;
 import com.example.habit_tracker.repository.TokenRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,16 +24,18 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final ObjectMapper objectMapper;
     Logger logger = LogManager.getLogger();
 
     public AuthenticationService(ProfileService profileService, TokenRepository tokenRepository,
                                  JwtService jwtService,
-                                 AuthenticationManager authenticationManager, EmailService emailService) {
+                                 AuthenticationManager authenticationManager, EmailService emailService, ObjectMapper objectMapper) {
         this.profileService = profileService;
         this.tokenRepository = tokenRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.emailService = emailService;
+        this.objectMapper = objectMapper;
     }
 
     public void register(@Valid RegisterDTO registerDTO) {
@@ -40,13 +44,43 @@ public class AuthenticationService {
 
         Profile profile = profileService.createUser(registerDTO);
 
-        String jwtToken = jwtService.generateToken(profile);
+        int tokenExpiredDate = 1000 * 60 * 60 * 24;
+        String jwtToken = jwtService.generateToken(profile, tokenExpiredDate);
 
         String link = "http://localhost:8080/api/v1/auth/verify-email?token=" + jwtToken;
         emailService.sendEmail(profile.getEmail(), "Email Verification", "Click on this link to verify your email: " + link);
 
         saveUserToken(profile, jwtToken);
     }
+
+    public void resetPassword(String email) throws JsonProcessingException {
+
+        AuthenticationRequest mappedEmail = objectMapper.readValue(email, AuthenticationRequest.class);
+
+        int tokenExpiredDate = 1000 * 60 * 30;
+        Profile profile = profileService.findByEmail(mappedEmail.getEmail());
+
+        String jwtToken = jwtService.generateToken(profile, tokenExpiredDate);
+        revokeAllUserTokens(profile);
+        saveUserToken(profile, jwtToken);
+
+
+        String link = "http://localhost:8080/api/v1/auth/reset-password?token=" + jwtToken;
+        emailService.sendEmail(profile.getEmail(), "Password Reset", "Click on this link to reset tour password: " + link);
+    }
+
+    public void updatePassword(Profile profile, String password) throws Exception {
+
+        AuthenticationRequest mappedPassword = objectMapper.readValue(password, AuthenticationRequest.class);
+
+        int tokenExpiredDate = 1000 * 60 * 60 * 24;
+        Profile updatedProfile = profileService.updPassword(profile, mappedPassword.getPassword());
+        String jwtToken = jwtService.generateToken(updatedProfile, tokenExpiredDate);
+        revokeAllUserTokens(profile);
+
+        saveUserToken(profile, jwtToken);
+    }
+
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception {
 
@@ -58,7 +92,8 @@ public class AuthenticationService {
                             request.getPassword()
                     )
             );
-            var jwtToken = jwtService.generateToken(profile);
+            int tokenExpiredDate = 1000 * 60 * 60 * 24;
+            var jwtToken = jwtService.generateToken(profile, tokenExpiredDate);
             revokeAllUserTokens(profile);
             saveUserToken(profile, jwtToken);
             logger.info("Authentication");
@@ -88,8 +123,10 @@ public class AuthenticationService {
 
     public void revokeAllUserTokens(Profile profile) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(profile.getId());
-        if (validUserTokens.isEmpty())
+        if (validUserTokens.isEmpty()) {
+            logger.info("tokens not found");
             return;
+        }
         validUserTokens.forEach(token -> {
             token.setExpired(true);
             token.setRevoked(true);

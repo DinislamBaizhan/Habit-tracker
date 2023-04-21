@@ -32,6 +32,7 @@ public class ProfileService {
 
     public Profile getAuthenticatedProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         String email = authentication.getName();
         return repository.findByEmail(email).orElseThrow(
                 () -> {
@@ -91,5 +92,26 @@ public class ProfileService {
                     return new DataNotFound("profile not found");
                 }
         );
+    }
+
+    public Profile updPassword(Profile profile, String password) {
+        profile.setPassword(passwordEncoder.encode(password));
+        try {
+            return repository.save(profile);
+        } catch (Exception e) {
+            throw new RuntimeException("fail to update password " + e.getCause());
+        }
+    }
+
+
+    public void delete() {
+        Profile profile = getAuthenticatedProfile();
+        try {
+            repository.delete(profile);
+            logger.info("profile deleted " + profile.getEmail());
+        } catch (DataAccessException e) {
+            logger.trace("profile not found " + e.getMessage() + "cause" + e.getCause());
+            throw new DataNotFound("profile not found " + e.getMessage());
+        }
     }
 }

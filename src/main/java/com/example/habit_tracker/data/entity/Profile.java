@@ -38,11 +38,11 @@ public class Profile extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
     @JsonIgnore
-    @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Token> tokens = new ArrayList<>();
-    @Column(name = "is_enabled")
+    @JsonIgnore
     private Boolean isenabled;
-    @Column(name = "waiting_for_verification")
+    @JsonIgnore
     private Boolean waitingForVerification = true;
 
     public Profile(String firstname,

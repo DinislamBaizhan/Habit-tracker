@@ -2,6 +2,7 @@ package com.example.habit_tracker.service;
 
 import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.entity.Token;
+import com.example.habit_tracker.exception.DataNotFound;
 import com.example.habit_tracker.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -36,27 +37,26 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        int date = 1000 * 60 * 60;
+    public String generateToken(UserDetails userDetails, int tokenExpiredDate) {
         if (userDetails.isEnabled()) {
-            date = 1000 * 60 * 60 * 24;
-            return generateToken(new HashMap<>(), userDetails, date);
+            tokenExpiredDate = 1000 * 60 * 30;
+            return generateToken(new HashMap<>(), userDetails, tokenExpiredDate);
         }
-        return generateToken(new HashMap<>(), userDetails, date);
+        return generateToken(new HashMap<>(), userDetails, tokenExpiredDate);
     }
 
 
     public String generateToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails,
-            int date
+            int tokenExpiredDate
     ) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + date))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenExpiredDate))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -90,6 +90,10 @@ public class JwtService {
     }
 
     public Token get(Profile profile) {
-        return repository.findTokenByProfile(profile);
+        try {
+            return repository.getTokenByProfile(profile);
+        } catch (DataNotFound e) {
+            throw new DataNotFound("not found token");
+        }
     }
 }
