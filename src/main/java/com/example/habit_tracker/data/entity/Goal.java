@@ -3,13 +3,18 @@ package com.example.habit_tracker.data.entity;
 import com.example.habit_tracker.data.enums.Unit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Value;
 
 @Entity
 public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int quantity;
+    private int requiredRepetitionsPerDay;
+    private int performedRepetitionsPerDay;
+
+    @Value("${some.key:false}")
+    private boolean allGoalsAchievedOnTheDay;
     private Unit unit;
     @OneToOne(mappedBy = "goal")
     @JsonIgnore
@@ -23,12 +28,12 @@ public class Goal {
         this.id = id;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getRequiredRepetitionsPerDay() {
+        return requiredRepetitionsPerDay;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setRequiredRepetitionsPerDay(int quantity) {
+        this.requiredRepetitionsPerDay = quantity;
     }
 
     public Unit getUnit() {
@@ -45,5 +50,24 @@ public class Goal {
 
     public void setHabit(Habit habit) {
         this.habit = habit;
+    }
+
+    public int getPerformedRepetitionsPerDay() {
+        return performedRepetitionsPerDay;
+    }
+
+    public void addAchievedGoals(Integer achievedGoals) {
+        this.performedRepetitionsPerDay += achievedGoals;
+        if (this.performedRepetitionsPerDay == requiredRepetitionsPerDay) {
+            allGoalsAchievedOnTheDay = true;
+        }
+    }
+
+    public boolean isAllGoalsAchievedOnTheDay() {
+        return allGoalsAchievedOnTheDay;
+    }
+
+    public void setAllGoalsAchievedOnTheDay(boolean allGoalsAchievedOnTheDay) {
+        this.allGoalsAchievedOnTheDay = allGoalsAchievedOnTheDay;
     }
 }

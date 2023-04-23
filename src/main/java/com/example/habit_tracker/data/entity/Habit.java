@@ -12,10 +12,13 @@ public class Habit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String description;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
     private Profile profile;
+
+
     //    //////////////////////////////////////////////////////////////////
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "goal_id")
@@ -66,6 +69,7 @@ public class Habit {
 
     //    ////////////////////////////////////////////////////////////////
 
+
     public List<CalendarMark> getCalendarMarks() {
         return calendarMarks;
     }
@@ -96,5 +100,13 @@ public class Habit {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
