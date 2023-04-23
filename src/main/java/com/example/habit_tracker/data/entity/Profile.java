@@ -46,7 +46,7 @@ public class Profile implements UserDetails {
     @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Token> tokens = new ArrayList<>();
     @JsonIgnore
-    private Boolean isenabled;
+    private Boolean isEnabled;
     @JsonIgnore
     private Boolean waitingForVerification = true;
     private String iconLink;
@@ -69,7 +69,7 @@ public class Profile implements UserDetails {
         this.password = password;
         this.role = role;
         this.waitingForVerification = waitingForVerification;
-        isenabled = false;
+        isEnabled = false;
     }
 
     public Profile() {
@@ -155,11 +155,11 @@ public class Profile implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isenabled;
+        return isEnabled;
     }
 
     public void setEnabled(Boolean enabled) {
-        this.isenabled = enabled;
+        this.isEnabled = enabled;
     }
 
     public String getFirstname() {
