@@ -1,6 +1,5 @@
 package com.example.habit_tracker.data.entity;
 
-import com.example.habit_tracker.data.enums.Unit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +14,7 @@ public class Goal {
 
     @Value("${some.key:false}")
     private boolean allGoalsAchievedOnTheDay;
-    private Unit unit;
+    private String unit;
     @OneToOne(mappedBy = "goal")
     @JsonIgnore
     private Habit habit;
@@ -36,11 +35,11 @@ public class Goal {
         this.requiredRepetitionsPerDay = quantity;
     }
 
-    public Unit getUnit() {
+    public String getUnit() {
         return unit;
     }
 
-    public void setUnit(Unit unit) {
+    public void setUnit(String unit) {
         this.unit = unit;
     }
 
