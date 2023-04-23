@@ -27,17 +27,23 @@ public class Habit {
     @JoinColumn(name = "goal_id")
     private Goal goal;
 
+    private RepeatType repeatType;
+
     @OneToMany(mappedBy = "habit", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<CalendarMark> calendarMarks;
 
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public Habit(Long id, String name, Profile profile, Goal goal, List<CalendarMark> calendarMarks, LocalDate startDate, LocalDate endDate) {
+    public Habit(Long id, String name, String description,
+                 Profile profile, Goal goal, RepeatType repeatType,
+                 List<CalendarMark> calendarMarks, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.name = name;
+        this.description = description;
         this.profile = profile;
         this.goal = goal;
+        this.repeatType = repeatType;
         this.calendarMarks = calendarMarks;
         this.startDate = startDate;
         this.endDate = endDate;
