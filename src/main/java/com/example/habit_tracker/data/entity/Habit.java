@@ -1,6 +1,8 @@
 package com.example.habit_tracker.data.entity;
 
+import com.example.habit_tracker.data.enums.RepeatType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -12,6 +14,7 @@ public class Habit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @Schema(description = "User-defined description of the habit")
     private String description;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

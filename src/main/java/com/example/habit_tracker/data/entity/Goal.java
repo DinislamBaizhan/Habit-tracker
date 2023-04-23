@@ -1,6 +1,7 @@
 package com.example.habit_tracker.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -9,11 +10,15 @@ public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Schema(description = "User-defined target repetitions in one day")
     private int requiredRepetitionsPerDay;
+    @Schema(description = "Actual performed repetitions in one day")
     private int performedRepetitionsPerDay;
 
     @Value("${some.key:false}")
+    @Schema(description = "A flag to check if user has performed all repetitions this day")
     private boolean allGoalsAchievedOnTheDay;
+    @Schema(description = "User-defined measurement units for the goal")
     private String unit;
     @OneToOne(mappedBy = "goal")
     @JsonIgnore
