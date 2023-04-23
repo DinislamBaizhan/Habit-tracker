@@ -21,7 +21,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "profiles")
-public class Profile extends BaseEntity implements UserDetails {
+public class Profile implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @NotNull
     @Size(min = 2, max = 20)
     private String firstname;
@@ -51,6 +54,8 @@ public class Profile extends BaseEntity implements UserDetails {
     private Language language;
     @Enumerated(EnumType.STRING)
     private Color color;
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Habit> habits = new ArrayList<>();
 
     public Profile(String firstname,
                    String lastname,
@@ -69,6 +74,24 @@ public class Profile extends BaseEntity implements UserDetails {
 
     public Profile() {
 
+    }
+
+    public List<Habit> getHabits() {
+        return habits;
+    }
+
+    public void setHabits(List<Habit> habits) {
+        this.habits = habits;
+    }
+
+    public void addHabits(Habit habit) {
+        habits.add(habit);
+        habit.setProfile(this);
+    }
+
+    public void deleteHabit(Habit habit) {
+        habits.remove(habit);
+        habit.setProfile(null);
     }
 
     @Override
@@ -185,5 +208,13 @@ public class Profile extends BaseEntity implements UserDetails {
 
     public void setWaitingForVerification(Boolean waitingForVerification) {
         this.waitingForVerification = waitingForVerification;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
