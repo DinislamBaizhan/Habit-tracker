@@ -6,6 +6,7 @@ import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.exception.DataNotFound;
 import com.example.habit_tracker.repository.GoalRepository;
 import com.example.habit_tracker.repository.HabitRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -53,16 +54,20 @@ public class HabitService {
 
         LocalDate today = LocalDate.now();
 
-        if (habit.getStartDate().isBefore(today)
-                && habit.getEndDate().isAfter(today)) {
+        if (habit.getStartDate().isAfter(today)
+                && habit.getEndDate().isBefore(today)) {
             throw new Exception("enter data between " + habit.getStartDate()
                     + " and " + habit.getEndDate() + " days");
         }
 
-        Goal goal = goalRepository.findByHabitId(habitId).orElseThrow(() ->
-                new DataNotFound("goal not found for id: " + habit));
-        goal.addAchievedGoals(value);
-        return goalRepository.save(goal);
+        if(habit.getGoal().isAllGoalsAchievedOnTheDay()) {
+            throw new Exception("All goals for today have been achieved!");
+        } else {
+            Goal goal = goalRepository.findByHabitId(habitId).orElseThrow(() ->
+                    new DataNotFound("goal not found for id: " + habit));
+            goal.addAchievedGoals(value);
+            return goalRepository.save(goal);
+        }
 
     }
 }

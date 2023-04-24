@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 
 @Entity

@@ -87,6 +87,11 @@ public class Habit {
         this.calendarMarks = calendarMarks;
     }
 
+    public void addCalendarMark(CalendarMark calendarMark) {
+        this.calendarMarks.add(calendarMark);
+        calendarMark.setHabit(this);
+    }
+
     public String getName() {
         return name;
     }
