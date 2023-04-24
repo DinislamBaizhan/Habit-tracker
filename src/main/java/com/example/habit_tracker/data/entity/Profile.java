@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,7 +44,9 @@ public class Profile implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
     @JsonIgnore
-    @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "profile",
+            fetch = FetchType.EAGER, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<Token> tokens = new ArrayList<>();
     @JsonIgnore
     private Boolean isEnabled;
@@ -54,7 +57,10 @@ public class Profile implements UserDetails {
     private Language language;
     @Enumerated(EnumType.STRING)
     private Color color;
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "profile",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER,
+            orphanRemoval = true)
     private List<Habit> habits = new ArrayList<>();
 
     public Profile(String firstname,

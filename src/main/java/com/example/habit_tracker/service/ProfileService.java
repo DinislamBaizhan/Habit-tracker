@@ -2,7 +2,7 @@ package com.example.habit_tracker.service;
 
 import com.example.habit_tracker.data.dto.ProfileDTO;
 import com.example.habit_tracker.data.entity.Profile;
-import com.example.habit_tracker.data.entity.RegisterDTO;
+import com.example.habit_tracker.data.dto.RegisterDTO;
 import com.example.habit_tracker.data.enums.Role;
 import com.example.habit_tracker.exception.DataNotFound;
 import com.example.habit_tracker.exception.DuplicateKey;
@@ -50,7 +50,7 @@ public class ProfileService {
 
     public Profile createUser(@Valid RegisterDTO request) {
 
-        Optional<Profile> profile = repository.findByEmail(request.getEmail());
+        Optional<Profile> profile = repository.getProfileByEmail(request.getEmail());
 
         if (profile.isPresent() && profile.get().getWaitingForVerification()) {
             return profile.get();
@@ -70,7 +70,7 @@ public class ProfileService {
 
             return repository.save(newProfile);
         } catch (DataAccessException e) {
-            logger.error("Failed to create new profile", e.getCause());
+            logger.trace("Falideld save token" + e + e.getCause());
             throw new RuntimeException("Failed to create new profile", e.getCause());
         }
     }

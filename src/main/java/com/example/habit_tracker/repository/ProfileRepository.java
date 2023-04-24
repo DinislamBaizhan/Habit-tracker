@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface ProfileRepository extends CrudRepository<Profile, Long> {
 
     Optional<Profile> findByEmail(String email);
+    Optional<Profile> getProfileByEmail(String email);
 
 }

@@ -7,6 +7,7 @@ import com.example.habit_tracker.service.HabitService;
 import com.example.habit_tracker.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.hibernate.Hibernate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,8 +35,7 @@ public class HabitController {
     @GetMapping
     @Operation(summary = "Get the list of existing habits for the profile")
     public List<Habit> get() {
-        Profile profile = profileService.getAuthenticatedProfile();
-        return profile.getHabits();
+        return habitService.get();
     }
 
     @GetMapping("/{id}")
@@ -46,7 +46,10 @@ public class HabitController {
 
     @PostMapping("/{habitId}/goal")
     @Operation(summary = "Update habit goal with new value")
-    public Goal increaseAchievedGoals(@PathVariable Long habitId, @RequestBody int value) {
+    public Goal increaseAchievedGoals(
+            @PathVariable Long habitId,
+            @RequestBody int value) throws Exception {
+
         return habitService.increaseGoals(habitId, value);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.habit_tracker.data.entity;
+package com.example.habit_tracker.data.dto;
 
 import com.example.habit_tracker.data.Password;
 import jakarta.validation.constraints.Email;

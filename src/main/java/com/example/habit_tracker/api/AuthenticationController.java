@@ -1,7 +1,7 @@
 package com.example.habit_tracker.api;
 
 import com.example.habit_tracker.data.entity.Profile;
-import com.example.habit_tracker.data.entity.RegisterDTO;
+import com.example.habit_tracker.data.dto.RegisterDTO;
 import com.example.habit_tracker.data.request.AuthenticationRequest;
 import com.example.habit_tracker.data.response.AuthenticationResponse;
 import com.example.habit_tracker.service.AuthenticationService;

@@ -8,6 +8,7 @@ import com.example.habit_tracker.repository.GoalRepository;
 import com.example.habit_tracker.repository.HabitRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -35,7 +36,9 @@ public class HabitService {
 
     public List<Habit> get() {
         Profile profile = profileService.getAuthenticatedProfile();
-        return profile.getHabits();
+        return habitRepository.findHabitsByProfileId(profile.getId())
+                .orElseThrow(()
+                -> new DataNotFound("data not found"));
     }
 
     public Habit get(Long habitId) {
@@ -44,8 +47,18 @@ public class HabitService {
                 .orElseThrow(() -> new DataNotFound("habit not found for Id " + habitId));
     }
 
-    public Goal increaseGoals(Long habitId, int value) {
+
+    public Goal increaseGoals(Long habitId, int value) throws Exception {
         Habit habit = get(habitId);
+
+        LocalDate today = LocalDate.now();
+
+        if (habit.getStartDate().isBefore(today)
+                && habit.getEndDate().isAfter(today)) {
+            throw new Exception("enter data between " + habit.getStartDate()
+                    + " and " + habit.getEndDate() + " days");
+        }
+
         Goal goal = goalRepository.findByHabitId(habitId).orElseThrow(() ->
                 new DataNotFound("goal not found for id: " + habit));
         goal.addAchievedGoals(value);
