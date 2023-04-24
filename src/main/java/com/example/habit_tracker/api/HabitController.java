@@ -42,6 +42,11 @@ public class HabitController {
         return habitService.get(id);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) throws Exception {
+        habitService.delete(id);
+    }
+
     @PostMapping("/{habitId}/goal")
     @Operation(summary = "Update habit goal with new value")
     public Goal increaseAchievedGoals(

@@ -6,7 +6,6 @@ import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.exception.DataNotFound;
 import com.example.habit_tracker.repository.GoalRepository;
 import com.example.habit_tracker.repository.HabitRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -39,7 +38,7 @@ public class HabitService {
         Profile profile = profileService.getAuthenticatedProfile();
         return habitRepository.findHabitsByProfileId(profile.getId())
                 .orElseThrow(()
-                -> new DataNotFound("data not found"));
+                        -> new DataNotFound("data not found"));
     }
 
     public Habit get(Long habitId) {
@@ -60,7 +59,7 @@ public class HabitService {
                     + " and " + habit.getEndDate() + " days");
         }
 
-        if(habit.getGoal().isAllGoalsAchievedOnTheDay()) {
+        if (habit.getGoal().isAllGoalsAchievedOnTheDay()) {
             throw new Exception("All goals for today have been achieved!");
         } else {
             Goal goal = goalRepository.findByHabitId(habitId).orElseThrow(() ->
@@ -69,5 +68,16 @@ public class HabitService {
             return goalRepository.save(goal);
         }
 
+    }
+
+    public void delete(Long habitId) throws Exception {
+        Profile profile = profileService.getAuthenticatedProfile();
+        try {
+            Habit habit = habitRepository.findByIdAndProfileId(habitId, profile.getId())
+                    .orElseThrow(() -> new DataNotFound("habit not found"));
+            habitRepository.delete(habit);
+        } catch (Exception e) {
+            throw new Exception("not found delete");
+        }
     }
 }

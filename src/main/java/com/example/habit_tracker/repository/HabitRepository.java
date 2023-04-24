@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface HabitRepository extends JpaRepository<Habit, Long> {
     Optional<Habit> findByIdAndProfileId(Long habitId, Long profileId);
+
     Optional<List<Habit>> findHabitsByProfileId(Long profileId);
 }
