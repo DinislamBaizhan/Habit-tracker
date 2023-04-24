@@ -1,6 +1,5 @@
 package com.example.habit_tracker.api;
 
-import com.example.habit_tracker.data.dto.ProfileDTO;
 import com.example.habit_tracker.data.dto.RegisterDTO;
 import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.enums.Role;
@@ -10,36 +9,20 @@ import com.example.habit_tracker.repository.TokenRepository;
 import com.example.habit_tracker.service.AuthenticationService;
 import com.example.habit_tracker.service.JwtService;
 import com.example.habit_tracker.service.ProfileService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwt;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
-import java.util.logging.Logger;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-import static org.assertj.core.api.InstanceOfAssertFactories.map;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@ExtendWith(SpringExtension.class)
 @WebMvcTest(AuthenticationController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class AuthenticationControllerTest {
@@ -93,8 +76,6 @@ class AuthenticationControllerTest {
                         .content(jsonContent))
                 .andExpect(status().isInternalServerError());
     }
-
-
 
     @Test
     void authenticateTest() throws Exception {
