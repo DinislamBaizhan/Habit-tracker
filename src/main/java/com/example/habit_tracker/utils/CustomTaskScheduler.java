@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
 
@@ -36,54 +37,44 @@ public class CustomTaskScheduler {
     }
 
     @Transactional
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 1 1 * * *")
     public void myMethod() {
+        Calendar counter = Calendar.getInstance();
+
+        CalendarMark complete = new CalendarMark();
+        CalendarMark notComplete = new CalendarMark();
+        CalendarMark notHabit = new CalendarMark();
+
+        complete.setMarksDate(counter);
+        notComplete.setMarksDate(counter);
+        notHabit.setMarksDate(counter);
+
         List<Habit> habits = habitRepository.findAll();
 
-        CalendarMark goalsAchievedMark = new CalendarMark();
-        goalsAchievedMark.setName("goals achieved");
-        CalendarMark notFoundMark = new CalendarMark();
-        notFoundMark.setName("not found");
-
         for (Habit habit : habits) {
-            CalendarMark mark = new CalendarMark();
-            mark.setMarksDate(Calendar.getInstance());
-            habit.addCalendarMark(mark);
+            LocalDate today = LocalDate.now();
+            if (habit.getStartDate().isBefore(today) && habit.getEndDate().isAfter(today)) {
 
-            if (habit.getGoal().isAllGoalsAchievedOnTheDay()) {
-                mark.setName(goalsAchievedMark.getName() + ": " + habit.getName());
-                calendarMarkRepository.save(mark);
+                if (habit.getGoal().isAllGoalsAchievedOnTheDay()) {
+
+                    complete.addCounterDay();
+                    complete.setName("Today we mastered the habit with the name: "
+                            + habit.getName() + " and id: "
+                            + habit.getId());
+                    habit.addCalendarMark(complete);
+                    calendarMarkRepository.save(complete);
+                } else {
+
+                    notComplete.setName("Today you haven't mastered the habit");
+                    habit.addCalendarMark(notComplete);
+                    calendarMarkRepository.save(notComplete);
+                }
             } else {
-                mark.setName(notFoundMark.getName());
-                calendarMarkRepository.save(mark);
+                habit.addCalendarMark(notHabit);
+                calendarMarkRepository.save(notHabit);
             }
         }
+
+
     }
-
-
-    //    @Scheduled(cron = "0 1 1 * * *")
-//    @Transactional
-//    @Scheduled(cron = "0 * * * * *")
-//    public void myMethod() {
-//        CalendarMark everyDay = new CalendarMark();
-//        Calendar currenDate = Calendar.getInstance();
-//        everyDay.setMarksDate(currenDate);
-//
-//        List<Habit> habits = habitRepository.findAll();
-//
-//        for (Habit habit : habits) {
-//            habit.addCalendarMark(everyDay);
-//            if (habit.getGoal().isAllGoalsAchievedOnTheDay()) {
-//
-//                everyDay.setName("goals achieved: " + habit.getName());
-//                calendarMarkRepository.save(everyDay);
-//
-//            } else {
-//                everyDay.setName("not found");
-//                calendarMarkRepository.save(everyDay);
-//            }
-//
-//        }
-//    }
-
 }

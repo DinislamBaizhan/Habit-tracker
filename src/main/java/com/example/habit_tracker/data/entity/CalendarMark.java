@@ -1,11 +1,11 @@
 package com.example.habit_tracker.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
-import java.time.LocalDate;
 import java.util.Calendar;
 
 @Entity
@@ -13,8 +13,10 @@ public class CalendarMark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonFormat(pattern = "EEEE dd MMMM, a z")
     private Calendar marksDate;
     private String name;
+    private int counterDay;
 
     @ManyToOne
     @Cascade(CascadeType.ALL)
@@ -62,5 +64,13 @@ public class CalendarMark {
 
     public void setHabit(Habit habit) {
         this.habit = habit;
+    }
+
+    public int getCounterDay() {
+        return counterDay;
+    }
+
+    public void addCounterDay() {
+        counterDay++;
     }
 }

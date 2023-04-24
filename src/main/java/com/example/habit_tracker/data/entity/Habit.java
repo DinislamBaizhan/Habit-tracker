@@ -1,6 +1,7 @@
 package com.example.habit_tracker.data.entity;
 
 import com.example.habit_tracker.data.enums.RepeatType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -31,8 +32,9 @@ public class Habit {
 
     @OneToMany(mappedBy = "habit", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<CalendarMark> calendarMarks;
-
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
     public Habit(Long id, String name, String description,
@@ -74,6 +76,14 @@ public class Habit {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public RepeatType getRepeatType() {
+        return repeatType;
+    }
+
+    public void setRepeatType(RepeatType repeatType) {
+        this.repeatType = repeatType;
     }
 
     //    ////////////////////////////////////////////////////////////////
