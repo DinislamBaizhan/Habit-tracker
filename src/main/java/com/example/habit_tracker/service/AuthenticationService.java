@@ -57,7 +57,7 @@ public class AuthenticationService {
 
         String link = "http://localhost:8080/api/v1/auth/verify-email?token=" + jwtToken;
 
-        String emailContent = "<html><body><p>Нажмите на кнопку, чтобы подтвердить свой аккаунт:</p>" +
+        String emailContent = "<html><body><p>Click this button to verify your account:</p>" +
                 "<form method='POST' action='" + link + "'><input type='submit' value='Verify Email'/>"
                 + "</form></body></html>";
 
@@ -78,7 +78,8 @@ public class AuthenticationService {
 
 
         String link = "http://localhost:8080/api/v1/auth/reset-password?token=" + jwtToken;
-        emailService.sendEmail(profile.getEmail(), "Password Reset", "Click on this link to reset tour password: " + link);
+        emailService.sendEmail(profile.getEmail(), "Password Reset",
+                "Click on this link to reset your password: " + link);
     }
 
     @Transactional
