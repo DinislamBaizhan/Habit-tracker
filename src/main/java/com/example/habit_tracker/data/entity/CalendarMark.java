@@ -6,29 +6,29 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 
 @Entity
 public class CalendarMark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JsonFormat(pattern = "EEEE dd MMMM, a z")
-    private Calendar marksDate;
+    @JsonFormat(pattern = "EEEE dd MMMM")
+    private LocalDate marksDate;
     private String name;
     private int counterDay;
 
     @ManyToOne
     @Cascade(CascadeType.ALL)
-    @JoinColumn(name = "habit_id")
+    @JoinColumn(name = "profile_id")
     @JsonIgnore
-    private Habit habit;
+    private Profile profile;
 
-    public CalendarMark(Long id, Calendar marksDate, String name, Habit habit) {
+    public CalendarMark(Long id, LocalDate marksDate, String name, Profile habit) {
         this.id = id;
         this.marksDate = marksDate;
         this.name = name;
-        this.habit = habit;
+        this.profile = habit;
     }
 
     public CalendarMark() {
@@ -42,11 +42,11 @@ public class CalendarMark {
         this.id = id;
     }
 
-    public Calendar getMarksDate() {
+    public LocalDate getMarksDate() {
         return marksDate;
     }
 
-    public void setMarksDate(Calendar marksDate) {
+    public void setMarksDate(LocalDate marksDate) {
         this.marksDate = marksDate;
     }
 
@@ -58,12 +58,12 @@ public class CalendarMark {
         this.name = name;
     }
 
-    public Habit getHabit() {
-        return habit;
+    public Profile getProfile() {
+        return profile;
     }
 
-    public void setHabit(Habit habit) {
-        this.habit = habit;
+    public void setProfile(Profile profile) {
+        this.profile = profile;
     }
 
     public int getCounterDay() {

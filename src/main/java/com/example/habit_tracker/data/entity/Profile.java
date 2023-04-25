@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -61,7 +60,11 @@ public class Profile implements UserDetails {
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER,
             orphanRemoval = true)
+    @JsonIgnore
     private List<Habit> habits = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<CalendarMark> calendarMarks;
 
     public Profile(String firstname,
                    String lastname,
@@ -80,6 +83,19 @@ public class Profile implements UserDetails {
 
     public Profile() {
 
+    }
+
+    public List<CalendarMark> getCalendarMarks() {
+        return calendarMarks;
+    }
+
+    public void setCalendarMarks(List<CalendarMark> calendarMarks) {
+        this.calendarMarks = calendarMarks;
+    }
+
+    public void addCalendarMark(CalendarMark calendarMark) {
+        this.calendarMarks.add(calendarMark);
+        calendarMark.setProfile(this);
     }
 
     public List<Habit> getHabits() {

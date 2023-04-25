@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 public class Habit {
@@ -30,8 +29,6 @@ public class Habit {
 
     private RepeatType repeatType;
 
-    @OneToMany(mappedBy = "habit", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<CalendarMark> calendarMarks;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -39,14 +36,13 @@ public class Habit {
 
     public Habit(Long id, String name, String description,
                  Profile profile, Goal goal, RepeatType repeatType,
-                 List<CalendarMark> calendarMarks, LocalDate startDate, LocalDate endDate) {
+                 LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.profile = profile;
         this.goal = goal;
         this.repeatType = repeatType;
-        this.calendarMarks = calendarMarks;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -88,19 +84,6 @@ public class Habit {
 
     //    ////////////////////////////////////////////////////////////////
 
-
-    public List<CalendarMark> getCalendarMarks() {
-        return calendarMarks;
-    }
-
-    public void setCalendarMarks(List<CalendarMark> calendarMarks) {
-        this.calendarMarks = calendarMarks;
-    }
-
-    public void addCalendarMark(CalendarMark calendarMark) {
-        this.calendarMarks.add(calendarMark);
-        calendarMark.setHabit(this);
-    }
 
     public String getName() {
         return name;

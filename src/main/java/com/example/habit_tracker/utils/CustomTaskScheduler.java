@@ -2,6 +2,7 @@ package com.example.habit_tracker.utils;
 
 import com.example.habit_tracker.data.entity.CalendarMark;
 import com.example.habit_tracker.data.entity.Habit;
+import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.repository.CalendarMarkRepository;
 import com.example.habit_tracker.repository.GoalRepository;
 import com.example.habit_tracker.repository.HabitRepository;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
 
 @Component
@@ -37,9 +37,10 @@ public class CustomTaskScheduler {
     }
 
     @Transactional
-    @Scheduled(cron = "0 1 1 * * *")
+//    @Scheduled(cron = "0 1 1 * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void myMethod() {
-        Calendar counter = Calendar.getInstance();
+        LocalDate counter = LocalDate.now();
 
         CalendarMark complete = new CalendarMark();
         CalendarMark notComplete = new CalendarMark();
@@ -61,20 +62,22 @@ public class CustomTaskScheduler {
                     complete.setName("Today we mastered the habit with the name: "
                             + habit.getName() + " and id: "
                             + habit.getId());
-                    habit.addCalendarMark(complete);
+                    Profile profile = profileService.findByEmail(habit.getProfile().getEmail());
+                    profile.addCalendarMark(complete);
+                    complete.addCounterDay();
                     calendarMarkRepository.save(complete);
                 } else {
 
                     notComplete.setName("Today you haven't mastered the habit");
-                    habit.addCalendarMark(notComplete);
+                    Profile profile = profileService.findByEmail(habit.getProfile().getEmail());
+                    profile.addCalendarMark(notComplete);
                     calendarMarkRepository.save(notComplete);
                 }
             } else {
-                habit.addCalendarMark(notHabit);
+                Profile profile = profileService.findByEmail(habit.getProfile().getEmail());
+                profile.addCalendarMark(notHabit);
                 calendarMarkRepository.save(notHabit);
             }
         }
-
-
     }
 }
