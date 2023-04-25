@@ -91,7 +91,7 @@ public class AuthenticationService {
         Profile updatedProfile = profileService.updPassword(profile, mappedPassword.getPassword());
         String jwtToken = jwtService.generateToken(updatedProfile, tokenExpiredDate);
         revokeAllUserTokens(profile);
-        saveUserToken(profile, jwtToken);
+        saveUserToken(updatedProfile, jwtToken);
     }
 
     @Transactional
