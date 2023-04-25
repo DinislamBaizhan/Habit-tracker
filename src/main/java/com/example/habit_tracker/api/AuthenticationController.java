@@ -73,7 +73,7 @@ public class AuthenticationController {
         return ResponseEntity.ok("Email sent to confirm profile again");
     }
 
-    @PostMapping("/reset_password")
+    @PostMapping("/reset-password")
     @Operation(summary = "Request for password reset e-mail")
     public ResponseEntity<String> passwordReset(@RequestBody String email) throws JsonProcessingException {
         service.resetPassword(email);
