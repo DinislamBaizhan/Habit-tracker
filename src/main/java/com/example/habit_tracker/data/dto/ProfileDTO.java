@@ -3,6 +3,7 @@ package com.example.habit_tracker.data.dto;
 import com.example.habit_tracker.data.enums.Color;
 import com.example.habit_tracker.data.enums.Language;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProfileDTO {
@@ -11,6 +12,7 @@ public class ProfileDTO {
     private String email;
     private String icon;
     private Language language;
+    @Schema(description = "User-defined color scheme for the app")
     private Color color;
     private int counter;
 
