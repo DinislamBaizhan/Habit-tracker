@@ -27,6 +27,7 @@ public class Habit {
     @JoinColumn(name = "goal_id")
     private Goal goal;
 
+    @Schema(description = "User-defined type of habit repetition")
     private RepeatType repeatType;
 
     @JsonFormat(pattern = "yyyy-MM-dd")

@@ -43,6 +43,7 @@ public class HabitController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete the habit via habit ID")
     public void delete(@PathVariable Long id) throws Exception {
         habitService.delete(id);
     }
