@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.codec.binary.Base64;
 
-import java.io.UnsupportedEncodingException;
-
 
 public class DecodedToken {
     public String sub;
@@ -26,11 +24,9 @@ public class DecodedToken {
     public DecodedToken() {
     }
 
-    public static DecodedToken getDecoded(String encodedToken) throws UnsupportedEncodingException, JsonProcessingException {
+    public static DecodedToken getDecoded(String encodedToken) throws JsonProcessingException {
 
         String[] chunks = encodedToken.split("\\.");
-
-        String header = new String(Base64.decodeBase64(chunks[0]));
         String payload = new String(Base64.decodeBase64(chunks[1]));
 
         ObjectMapper objectMapper = new ObjectMapper();

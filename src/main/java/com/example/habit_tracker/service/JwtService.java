@@ -1,8 +1,5 @@
 package com.example.habit_tracker.service;
 
-import com.example.habit_tracker.data.entity.Profile;
-import com.example.habit_tracker.data.entity.Token;
-import com.example.habit_tracker.exception.DataNotFound;
 import com.example.habit_tracker.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -87,13 +84,5 @@ public class JwtService {
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    public Token get(Profile profile) {
-        try {
-            return repository.getTokenByProfile(profile);
-        } catch (DataNotFound e) {
-            throw new DataNotFound("not found token");
-        }
     }
 }

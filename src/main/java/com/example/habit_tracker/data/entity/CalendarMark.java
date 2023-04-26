@@ -13,10 +13,9 @@ public class CalendarMark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JsonFormat(pattern = "EEEE dd MMMM")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate marksDate;
     private String name;
-    private int counterDay;
 
     @ManyToOne
     @Cascade(CascadeType.ALL)
@@ -64,13 +63,5 @@ public class CalendarMark {
 
     public void setProfile(Profile profile) {
         this.profile = profile;
-    }
-
-    public int getCounterDay() {
-        return counterDay;
-    }
-
-    public void addCounterDay() {
-        counterDay++;
     }
 }

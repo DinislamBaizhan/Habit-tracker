@@ -65,6 +65,7 @@ public class Profile implements UserDetails {
     @JsonIgnore
     @OneToMany(mappedBy = "profile", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<CalendarMark> calendarMarks;
+    private int counterDay;
 
     public Profile(String firstname,
                    String lastname,
@@ -238,5 +239,13 @@ public class Profile implements UserDetails {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public int getCounterDay() {
+        return counterDay;
+    }
+
+    public void addCounterDay() {
+        counterDay++;
     }
 }

@@ -12,14 +12,21 @@ public class ProfileDTO {
     private String icon;
     private Language language;
     private Color color;
+    private int counter;
 
-    public ProfileDTO(String firstname, String lastname, String email, String icon, Language language, Color color) {
+    public ProfileDTO(String firstname,
+                      String lastname, String email,
+                      String icon, Language language,
+                      Color color,
+                      int counter
+    ) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.icon = icon;
         this.language = language;
         this.color = color;
+        this.counter = counter;
     }
 
     public ProfileDTO() {
@@ -71,5 +78,13 @@ public class ProfileDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public void setCounter(int counter) {
+        this.counter = counter;
     }
 }

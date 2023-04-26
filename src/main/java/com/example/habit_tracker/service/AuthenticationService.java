@@ -26,8 +26,6 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final ObjectMapper objectMapper;
-    //    @PersistenceContext
-//    private final EntityManager entityManager;
     Logger logger = LogManager.getLogger();
 
     public AuthenticationService(ProfileService profileService,
@@ -35,15 +33,13 @@ public class AuthenticationService {
                                  JwtService jwtService,
                                  AuthenticationManager authenticationManager,
                                  EmailService emailService,
-                                 ObjectMapper objectMapper
-            /*EntityManager entityManager*/) {
+                                 ObjectMapper objectMapper) {
         this.profileService = profileService;
         this.tokenRepository = tokenRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.emailService = emailService;
         this.objectMapper = objectMapper;
-//        this.entityManager = entityManager;
     }
 
     @Transactional

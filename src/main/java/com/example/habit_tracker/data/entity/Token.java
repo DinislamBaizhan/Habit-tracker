@@ -5,27 +5,24 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
-@Entity
-public class Token {
+import java.io.Serializable;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Entity
+public class Token implements Serializable {
 
     @Column(unique = true)
     public String token;
-
     @Enumerated(EnumType.STRING)
     public TokenType tokenType = TokenType.BEARER;
-
     public boolean revoked;
-
     public boolean expired;
-
     @ManyToOne
     @Cascade(CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     public Profile profile;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     public Token(String token, TokenType tokenType, boolean revoked, boolean expired, Profile profile) {
         this.token = token;

@@ -1,8 +1,8 @@
 package com.example.habit_tracker.service;
 
 import com.example.habit_tracker.data.dto.ProfileDTO;
-import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.dto.RegisterDTO;
+import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.enums.Role;
 import com.example.habit_tracker.exception.DataNotFound;
 import com.example.habit_tracker.exception.DuplicateKey;
@@ -40,10 +40,7 @@ public class ProfileService {
 
         String email = authentication.getName();
         return repository.findByEmail(email).orElseThrow(
-                () -> {
-                    logger.error("profile not found", email);
-                    return new DataNotFound("profile not found");
-                }
+                () -> new DataNotFound("profile not found")
         );
     }
 
@@ -52,9 +49,9 @@ public class ProfileService {
 
         Optional<Profile> profile = repository.getProfileByEmail(request.getEmail());
 
-        if (profile.isPresent() && profile.get().getWaitingForVerification()) {
+        if (profile.isPresent() && Boolean.TRUE.equals(profile.get().getWaitingForVerification())) {
             return profile.get();
-        } else if (profile.isPresent() && !profile.get().getWaitingForVerification()) {
+        } else if (profile.isPresent() && Boolean.TRUE.equals(!profile.get().getWaitingForVerification())) {
             logger.error("Profile already registered", request.getEmail());
             throw new DuplicateKey("Profile already registered");
         }
@@ -94,7 +91,8 @@ public class ProfileService {
                 profile.getEmail(),
                 profile.getIconLink(),
                 profile.getLanguage(),
-                profile.getColor()
+                profile.getColor(),
+                profile.getCounterDay()
         );
     }
 
@@ -107,7 +105,7 @@ public class ProfileService {
         );
     }
 
-    public Profile updPassword(Profile profile, String password) {
+    public Profile updPassword(Profile profile, String password) throws Exception {
         profile.setPassword(passwordEncoder.encode(password));
         try {
             return repository.save(profile);
@@ -165,7 +163,7 @@ public class ProfileService {
     public Profile save(Profile profile) {
         try {
             return repository.save(profile);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             logger.error("fail save to database " + profile);
             throw new RuntimeException("fail save to database " + profile);
         }
