@@ -52,7 +52,7 @@ public class ProfileService {
         if (profile.isPresent() && Boolean.TRUE.equals(profile.get().getWaitingForVerification())) {
             return profile.get();
         } else if (profile.isPresent() && Boolean.TRUE.equals(!profile.get().getWaitingForVerification())) {
-            logger.error("Profile already registered", request.getEmail());
+            logger.error("Profile already registered %s ", request.getEmail());
             throw new DuplicateKey("Profile already registered");
         }
         try {
@@ -67,7 +67,7 @@ public class ProfileService {
 
             return repository.save(newProfile);
         } catch (DataAccessException e) {
-            logger.trace("Falideld save token" + e + e.getCause());
+            logger.debug("Falideld save token %s " + e.getCause());
             throw new RuntimeException("Failed to create new profile", e.getCause());
         }
     }
@@ -78,7 +78,7 @@ public class ProfileService {
             profile.setWaitingForVerification(false);
             repository.save(profile);
         } catch (Exception e) {
-            logger.error("error verify profile" + e.getMessage(), e.getCause());
+            logger.error("error verify profile %%s%s".formatted(e.getCause()));
             throw new Exception(e.getMessage(), e.getCause());
         }
     }
@@ -99,18 +99,18 @@ public class ProfileService {
     public Profile findByEmail(String email) {
         return repository.findByEmail(email).orElseThrow(
                 () -> {
-                    logger.error("user not found", email);
+                    logger.error("user not found %s", email);
                     return new DataNotFound("profile not found");
                 }
         );
     }
 
-    public Profile updPassword(Profile profile, String password) throws Exception {
+    public Profile updPassword(Profile profile, String password) {
         profile.setPassword(passwordEncoder.encode(password));
         try {
             return repository.save(profile);
-        } catch (Exception e) {
-            throw new RuntimeException("fail to update password " + e.getCause());
+        } catch (DataAccessException e) {
+            throw new DataNotFound("fail to update password %s" + e.getCause());
         }
     }
 
@@ -118,7 +118,7 @@ public class ProfileService {
         Profile profile = getAuthenticatedProfile();
         profile.setFirstname(name.get(0));
         profile.setLastname(name.get(1));
-        logger.info("rename: firstname - " + name.get(0) + "lastname -" + name.get(1));
+        logger.info("rename: firstname - %s", name.get(0) + "lastname - " + name.get(1));
         repository.save(profile);
         return getDTO();
     }
@@ -152,9 +152,9 @@ public class ProfileService {
         Profile profile = getAuthenticatedProfile();
         try {
             repository.delete(profile);
-            logger.info("profile deleted " + profile.getEmail());
+            logger.info("profile deleted %s ", profile.getEmail());
         } catch (DataAccessException e) {
-            logger.trace("profile not found " + e.getMessage() + "cause" + e.getCause());
+            logger.trace("profile not found %s ", e.getMessage() + "cause " + e.getCause());
             throw new DataNotFound("profile not found " + e.getMessage());
         }
     }
@@ -164,8 +164,8 @@ public class ProfileService {
         try {
             return repository.save(profile);
         } catch (DataAccessException e) {
-            logger.error("fail save to database " + profile);
-            throw new RuntimeException("fail save to database " + profile);
+            logger.error("fail save to database %s ", profile);
+            throw new DataNotFound("fail save to database " + profile);
         }
     }
 }

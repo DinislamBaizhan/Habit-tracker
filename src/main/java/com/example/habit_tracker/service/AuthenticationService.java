@@ -6,12 +6,14 @@ import com.example.habit_tracker.data.entity.Token;
 import com.example.habit_tracker.data.enums.TokenType;
 import com.example.habit_tracker.data.request.AuthenticationRequest;
 import com.example.habit_tracker.data.response.AuthenticationResponse;
+import com.example.habit_tracker.exception.DataNotFound;
 import com.example.habit_tracker.repository.TokenRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,7 @@ public class AuthenticationService {
     @Transactional
     public void register(@Valid RegisterDTO registerDTO) {
 
-        logger.info("register profile" + registerDTO.getEmail());
+        logger.info("Registering profile for email address: %s", registerDTO.getEmail());
         Profile profile = profileService.createUser(registerDTO);
         int tokenExpiredDate = 1000 * 60 * 60 * 24;
         String jwtToken = jwtService.generateToken(profile, tokenExpiredDate);
@@ -79,9 +81,13 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public void updatePassword(Profile profile, String password) throws Exception {
-
-        AuthenticationRequest mappedPassword = objectMapper.readValue(password, AuthenticationRequest.class);
+    public void updatePassword(Profile profile, String password) {
+        AuthenticationRequest mappedPassword = new AuthenticationRequest();
+        try {
+            objectMapper.readValue(password, AuthenticationRequest.class);
+        } catch (JsonProcessingException e) {
+            throw new DataNotFound("");
+        }
 
         int tokenExpiredDate = 1000 * 60 * 60 * 24;
         Profile updatedProfile = profileService.updPassword(profile, mappedPassword.getPassword());
@@ -91,7 +97,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception {
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
 
         Profile profile = profileService.findByEmail(request.getEmail());
         if (profile.isEnabled()) {
@@ -110,11 +116,10 @@ public class AuthenticationService {
                     jwtToken
             );
         } else {
-            throw new Exception("Verify email");
+            throw new DataNotFound("Verify email");
         }
     }
 
-    //    @Transactional
     public void saveUserToken(Profile profile, String jwtToken) {
         var token = new Token(
                 jwtToken,
@@ -124,14 +129,10 @@ public class AuthenticationService {
         );
         logger.info("save token");
         try {
-//            if (!entityManager.contains(token)){
-//                token = entityManager.merge(token);
-//            }
-//            entityManager.flush();
             tokenRepository.saveAndFlush(token);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             logger.error("Failed to save new token", e.getCause());
-            throw new RuntimeException("Failed to save new token", e.getCause());
+            throw new DataNotFound("Failed to save new token " + e.getCause());
         }
     }
 
@@ -147,9 +148,9 @@ public class AuthenticationService {
         });
         try {
             tokenRepository.saveAll(validUserTokens);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             logger.error("Failed to save all tokens\", e.getCause()");
-            throw new RuntimeException("Failed to save all tokens", e.getCause());
+            throw new DataNotFound("Failed to save all tokens " + e.getCause());
         }
     }
 }

@@ -3,7 +3,6 @@ package com.example.habit_tracker.api;
 import com.example.habit_tracker.data.entity.Goal;
 import com.example.habit_tracker.data.entity.Habit;
 import com.example.habit_tracker.service.HabitService;
-import com.example.habit_tracker.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +13,15 @@ import java.util.List;
 @RequestMapping("/api/v1/habit")
 @Tag(name = "habit controller", description = "Habit management")
 public class HabitController {
-    private final ProfileService profileService;
     private final HabitService habitService;
 
-    public HabitController(ProfileService profileService, HabitService habitService) {
-        this.profileService = profileService;
-
+    public HabitController(HabitService habitService) {
         this.habitService = habitService;
     }
 
     @PostMapping
     @Operation(summary = "Create new habit")
-    public Habit post(@RequestBody Habit habit) throws Exception {
+    public Habit post(@RequestBody Habit habit) {
         habit.getGoal().setRequiredRepetitionsPerDay(1);
         return habitService.post(habit);
     }

@@ -1,7 +1,7 @@
 package com.example.habit_tracker.api;
 
-import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.dto.RegisterDTO;
+import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.data.request.AuthenticationRequest;
 import com.example.habit_tracker.data.response.AuthenticationResponse;
 import com.example.habit_tracker.service.AuthenticationService;
@@ -32,7 +32,7 @@ public class AuthenticationController {
     @Operation(summary = "Register new user")
     public ResponseEntity<String> register(
             @RequestBody @Valid RegisterDTO request
-    ) throws Exception {
+    ) {
         service.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("Email sent to verify profile");
     }
@@ -41,7 +41,7 @@ public class AuthenticationController {
     @Operation(summary = "Authenticate a user")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
-    ) throws Exception {
+    ) {
         return ResponseEntity.ok(service.authenticate(request));
     }
 
@@ -57,7 +57,7 @@ public class AuthenticationController {
 
     @PostMapping("/again")
     @Operation(summary = "Request verification e-mail one more time")
-    public ResponseEntity<String> sendAgain(@RequestBody RegisterDTO registerDTO) throws Exception {
+    public ResponseEntity<String> sendAgain(@RequestBody RegisterDTO registerDTO) {
 
 
         Profile profile = profileService.findByEmail(registerDTO.getEmail());

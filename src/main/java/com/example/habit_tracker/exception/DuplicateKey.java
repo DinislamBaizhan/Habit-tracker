@@ -6,8 +6,4 @@ public class DuplicateKey extends DuplicateKeyException {
     public DuplicateKey(String msg) {
         super(msg);
     }
-
-    public DuplicateKey(String msg, Throwable cause) {
-        super(msg, cause);
-    }
 }
