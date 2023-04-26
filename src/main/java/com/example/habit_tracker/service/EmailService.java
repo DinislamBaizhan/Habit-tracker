@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
-
     private final JavaMailSender javaMailSender;
     Logger logger = LogManager.getLogger();
 
@@ -27,9 +26,9 @@ public class EmailService {
             helper.setSubject(subject);
             helper.setText(content, true);
             javaMailSender.send(message);
-            logger.info("send message to + %s ", email);
+            logger.info("send message to + " + email);
         } catch (MessagingException | jakarta.mail.MessagingException e) {
-            logger.error("Failed to send email for: %s ", email + " " + e);
+            logger.error("Failed to send email for: " + email + " " + e);
             throw new IllegalArgumentException("Failed to send email for: " + email);
         }
     }

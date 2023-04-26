@@ -24,13 +24,13 @@ public class HabitService {
         this.goalRepository = goalRepository;
     }
 
-    public Habit post(Habit habit) {
+    public Habit post(Habit habit) throws Exception {
         Profile profile = profileService.getAuthenticatedProfile();
         habit.setProfile(profile);
         try {
             return habitRepository.save(habit);
-        } catch (DataNotFound e) {
-            throw new DataNotFound("fail save habit " + e);
+        } catch (Exception e) {
+            throw new Exception("fail save habit " + e);
         }
     }
 
