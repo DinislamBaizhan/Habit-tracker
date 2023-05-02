@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -122,16 +123,12 @@ public class AuthenticationService {
                 false,
                 false, profile
         );
-        logger.info("save token");
         try {
-//            if (!entityManager.contains(token)){
-//                token = entityManager.merge(token);
-//            }
-//            entityManager.flush();
             tokenRepository.saveAndFlush(token);
-        } catch (Exception e) {
-            logger.error("Failed to save new token", e.getCause());
-            throw new RuntimeException("Failed to save new token", e.getCause());
+            logger.info("Token saved for user with id {}", profile.getId());
+        } catch (DataAccessException ex) {
+            logger.error("Failed to save token for user with id {}", profile.getId(), ex);
+            throw new RuntimeException("Failed to save token for user with id " + profile.getId(), ex);
         }
     }
 

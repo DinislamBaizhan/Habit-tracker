@@ -5,11 +5,8 @@ import com.example.habit_tracker.data.entity.Habit;
 import com.example.habit_tracker.data.entity.Profile;
 import com.example.habit_tracker.exception.DataNotFound;
 import com.example.habit_tracker.repository.CalendarMarkRepository;
-import com.example.habit_tracker.repository.GoalRepository;
 import com.example.habit_tracker.repository.HabitRepository;
 import com.example.habit_tracker.repository.ProfileRepository;
-import com.example.habit_tracker.service.HabitService;
-import com.example.habit_tracker.service.ProfileService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,30 +16,20 @@ import java.util.List;
 
 @Component
 public class CustomTaskScheduler {
-
-    private final ProfileService profileService;
     private final ProfileRepository profileRepository;
-    private final HabitService habitService;
     private final HabitRepository habitRepository;
-    private final GoalRepository goalRepository;
     private final CalendarMarkRepository calendarMarkRepository;
 
-    public CustomTaskScheduler(ProfileService profileService,
-                               ProfileRepository profileRepository, HabitService habitService,
+    public CustomTaskScheduler(ProfileRepository profileRepository,
                                HabitRepository habitRepository,
-                               GoalRepository goalRepository,
                                CalendarMarkRepository calendarMarkRepository) {
-        this.profileService = profileService;
         this.profileRepository = profileRepository;
-        this.habitService = habitService;
         this.habitRepository = habitRepository;
-        this.goalRepository = goalRepository;
         this.calendarMarkRepository = calendarMarkRepository;
     }
 
     @Transactional
-//    @Scheduled(cron = "0 1 1 * * *")
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 1 1 * * *")
     public void calendarScheduler() {
         LocalDate today = LocalDate.now();
         today = today.plusDays(1);
